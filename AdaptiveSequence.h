@@ -358,27 +358,17 @@ public:
         return seq;
     }
 
-    template<typename... Tuples, typename U>
-    Sequence<std::tuple<Tuples..., U>>* Zip(Sequence<U>* other) {
-        int zipSize = std::min(size, other->GetLength());
-        std::tuple<Tuples..., U>* zippedItems = new std::tuple<Tuples..., U>[zipSize];
-        
-        if constexpr (sizeof...(Tuples) == 0) {
-            for (int i = 0; i < zipSize; i++) {
-                zippedItems[i] = std::tuple<T, U>(data[head + i], other->Get(i));
-            }
-        } else {
-            auto create_tuple = [&]<size_t... Is>(std::index_sequence<Is...>) {
-                for (int i = 0; i < zipSize; i++) {
-                    T tuple = data[head + i];
-                    U value = other->Get(i);
-                    zippedItems[i] = std::tuple<Tuples..., U>(std::get<Is>(tuple)..., value);
-                }
-            };
-            create_tuple(std::index_sequence_for<Tuples...>{});
+    template<typename U>
+    Sequence<std::tuple<T, U>>* Zip(const Sequence<U>& other) {
+        if (!data || size == 0 || other.GetLength() == 0) {
+            return new AdaptiveSequence<std::tuple<T, U>>();
         }
-        
-        Sequence<std::tuple<Tuples..., U>>* result = new AdaptiveSequence<std::tuple<Tuples..., U>>(zippedItems, zipSize);
+        int zipSize = std::min(size, other.GetLength());
+        std::tuple<T, U>* zippedItems = new std::tuple<T, U>[zipSize];
+        for (int i = 0; i < zipSize; i++) {
+            zippedItems[i] = std::make_tuple(data[head + i], other.Get(i));
+        }
+        Sequence<std::tuple<T, U>>* result = new AdaptiveSequence<std::tuple<T, U>>(zippedItems, zipSize);
         delete[] zippedItems;
         return result;
     }
@@ -387,13 +377,13 @@ public:
     std::tuple<AdaptiveSequence<Tuples>...>* UnZip() const {
         std::tuple<AdaptiveSequence<Tuples>...>* result = new std::tuple<AdaptiveSequence<Tuples>...>();
         auto create_arrays = [&]<size_t... Is>(std::index_sequence<Is...>) {
-            ((std::get<Is>(*result) = AdaptiveSequence<Tuples>(new Tuples[size], size)), ...);
+            ((std::get<Is>(*result) = AdaptiveSequence<Tuples>(size)), ...);
         };
         create_arrays(std::index_sequence_for<Tuples...>{});
         auto fill_arrays = [&]<size_t... Is>(std::index_sequence<Is...>) {
             for (int i = 0; i < size; i++) {
-                auto tuple = this->Get(i);
-                ((std::get<Is>(*result)->InsertAt(i, std::get<Is>(tuple))), ...);
+                auto tuple = data[head + i];
+                ((std::get<Is>(*result).Append(std::get<Is>(tuple))), ...);
             }
         };
         fill_arrays(std::index_sequence_for<Tuples...>{});
@@ -454,3 +444,7 @@ public:
     //     return result;
     // }
 };
+
+
+
+

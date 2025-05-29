@@ -7,9 +7,9 @@ class LinkedList: public Container<T> {
 public:
     LinkedList(): head(nullptr), end(nullptr), size(0){}
 
-    LinkedList(int size): size(size){
-        for(int i = 0; i < size; i++){
-            append(0);
+    LinkedList(int size) : size(size) {
+        for (int i = 0; i < size; i++) {
+            append(T());
         }
     }
 

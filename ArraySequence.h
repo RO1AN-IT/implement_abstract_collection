@@ -117,27 +117,14 @@ protected:
         return this;
     }
 
-    template<typename... Tuples, typename U>
-    Sequence<std::tuple<Tuples..., U>>* ZipInternal(Sequence<U>* other) {
-        int zipSize = std::min(size, other->GetLength());
-        std::tuple<Tuples..., U>* zippedItems = new std::tuple<Tuples..., U>[zipSize];
-        
-        if constexpr (sizeof...(Tuples) == 0) {
-            for (int i = 0; i < zipSize; i++) {
-                zippedItems[i] = std::tuple<T, U>(data->get(i), other->Get(i));
-            }
-        } else {
-            auto create_tuple = [&]<size_t... Is>(std::index_sequence<Is...>) {
-                for (int i = 0; i < zipSize; i++) {
-                    T tuple = data->get(i);
-                    U value = other->Get(i);
-                    zippedItems[i] = std::tuple<Tuples..., U>(std::get<Is>(tuple)..., value);
-                }
-            };
-            create_tuple(std::index_sequence_for<Tuples...>{});
+     template<typename U>
+    Sequence<std::tuple<T, U>>* ZipInternal(const Sequence<U>& other) {
+        int zipSize = std::min(size, other.GetLength());
+        std::tuple<T, U>* zippedItems = new std::tuple<T, U>[zipSize];
+        for (int i = 0; i < zipSize; i++) {
+            zippedItems[i] = std::make_tuple(data->get(i), other.Get(i));
         }
-        
-        Sequence<std::tuple<Tuples..., U>>* result = new MutableArraySequence<std::tuple<Tuples..., U>>(zippedItems, zipSize);
+        Sequence<std::tuple<T, U>>* result = new MutableArraySequence<std::tuple<T, U>>(zippedItems, zipSize);
         delete[] zippedItems;
         return result;
     }
@@ -146,13 +133,13 @@ protected:
     std::tuple<ArraySequence<Tuples>...>* UnZipInternal() const {
         std::tuple<ArraySequence<Tuples>...>* result = new std::tuple<ArraySequence<Tuples>...>();
         auto create_arrays = [&]<size_t... Is>(std::index_sequence<Is...>) {
-            ((std::get<Is>(*result) = ArraySequence<Tuples>(new Tuples[size], size)), ...);
+            ((std::get<Is>(*result) = ArraySequence<Tuples>(size)), ...);
         };
         create_arrays(std::index_sequence_for<Tuples...>{});
         auto fill_arrays = [&]<size_t... Is>(std::index_sequence<Is...>) {
             for (int i = 0; i < size; i++) {
                 auto tuple = data->get(i);
-                ((std::get<Is>(*result).GetData()->Set(i, std::get<Is>(tuple))), ...);
+                ((std::get<Is>(*result).data->Set(i, std::get<Is>(tuple))), ...);
             }
         };
         fill_arrays(std::index_sequence_for<Tuples...>{});
@@ -349,8 +336,8 @@ public:
     }
 
     template<typename U>
-    Sequence<std::tuple<T, U>>* Zip(Sequence<U>* other) {
-        return ZipInternal<U>(other);
+    Sequence<std::tuple<T, U>>* Zip(const Sequence<U>& other) {
+        return ZipInternal(other);
     }
 
     template<typename... Tuples>

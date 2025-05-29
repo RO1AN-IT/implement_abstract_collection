@@ -194,6 +194,50 @@ int main() {
                 result = std::to_string(seq->Get(index));
                 command += " " + std::to_string(index);
             }
+            else if (operation == "Zip") {
+                std::string values;
+                std::getline(ss, values);
+                values = values.substr(1); // Remove leading space
+                std::vector<int> vals = parseValues(values);
+                Sequence<int>* other = createSameTypeSequence(seq, vals.data(), vals.size());
+                if (!other) {
+                    result = "Error: Failed to create sequence for Zip";
+                    command += " " + values;
+                    continue;
+                }
+                Sequence<std::tuple<int, int>>* zipped = nullptr;
+                try {
+                    if (auto* adaptiveSeq = dynamic_cast<AdaptiveSequence<int>*>(seq)) {
+                        zipped = adaptiveSeq->Zip(*other);
+                    }
+                    else if (auto* arraySeq = dynamic_cast<MutableArraySequence<int>*>(seq)) {
+                        zipped = arraySeq->Zip(*other);
+                    }
+                    else if (auto* listSeq = dynamic_cast<MutableListSequence<int>*>(seq)) {
+                        zipped = listSeq->Zip(*other);
+                    }
+                    if (zipped) {
+                        std::stringstream ss;
+                        ss << "[ ";
+                        for (int i = 0; i < zipped->GetLength(); i++) {
+                            auto tuple = zipped->Get(i);
+                            ss << "(" << std::get<0>(tuple) << ", " << std::get<1>(tuple) << ")";
+                            if (i < zipped->GetLength() - 1) ss << ", ";
+                        }
+                        ss << " ]";
+                        result = ss.str();
+                        delete zipped;
+                    }
+                    else {
+                        result = "Error: Zip not supported for " + collectionType;
+                    }
+                }
+                catch (const std::exception& e) {
+                    result = "Error in Zip: " + std::string(e.what());
+                }
+                command += " " + values;
+                delete other;
+            }
             else if (operation == "GetLength") {
                 result = std::to_string(seq->GetLength());
             }
@@ -227,12 +271,6 @@ int main() {
                 ss << " ]";
                 result = ss.str();
             }
-            // else if (operation == "Sum") {
-            //     result = std::to_string(seq->Sum());
-            // }
-            // else if (operation == "Product") {
-            //     result = std::to_string(seq->Product());
-            // }
             else if (operation == "FlatMap") {
                 Sequence<int>* flatMapped = nullptr;
                 if (auto* adaptiveSeq = dynamic_cast<AdaptiveSequence<int>*>(seq)) {
@@ -271,40 +309,7 @@ int main() {
                     result = "Error: Reduce not supported for " + collectionType;
                 }
             }
-            // else if (operation == "Zip") {
-            //     std::string values;
-            //     std::getline(ss, values);
-            //     values = values.substr(1); // Remove leading space
-            //     std::vector<int> vals = parseValues(values);
-            //     Sequence<int>* other = createSameTypeSequence(seq, vals.data(), vals.size());
-            //     Sequence<std::tuple<int, int>>* zipped = nullptr;
-            //     if (auto* adaptiveSeq = dynamic_cast<AdaptiveSequence<int>*>(seq)) {
-            //         zipped = adaptiveSeq->Zip<int>(other);
-            //     }
-            //     else if (auto* arraySeq = dynamic_cast<MutableArraySequence<int>*>(seq)) {
-            //         zipped = arraySeq->Zip<int>(other);
-            //     }
-            //     else if (auto* listSeq = dynamic_cast<MutableListSequence<int>*>(seq)) {
-            //         zipped = listSeq->Zip<int>(other);
-            //     }
-            //     if (zipped) {
-            //         std::stringstream ss;
-            //         ss << "[ ";
-            //         for (int i = 0; i < zipped->GetLength(); i++) {
-            //             auto tuple = zipped->Get(i);
-            //             ss << "(" << std::get<0>(tuple) << "," << std::get<1>(tuple) << ")";
-            //             if (i < zipped->GetLength() - 1) ss << ", ";
-            //         }
-            //         ss << " ]";
-            //         result = ss.str();
-            //         delete zipped;
-            //     }
-            //     else {
-            //         result = "Error: Zip not supported for " + collectionType;
-            //     }
-            //     delete other;
-            //     command += " " + values;
-            // }
+            
             else if (operation == "Split") {
                 Sequence<Sequence<int>*>* split = nullptr;
                 if (auto* arraySeq = dynamic_cast<MutableArraySequence<int>*>(seq)) {

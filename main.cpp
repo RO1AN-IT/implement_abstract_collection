@@ -6,33 +6,27 @@
 #include "AdaptiveSequence.h"
 #include "LinkedList.h"
 #include "DynamicArray.h"
+#include <utility>
+#include <tuple>
 
-// template<typename T>
-// void seq.toString() Sequence<T>* seq) {
-//     std::cout << "[ ";
-//     for (int i = 0; i < seq->GetLength(); ++i) {
-//         std::cout << seq->Get(i);
-//         if (i < seq->GetLength() - 1) std::cout << ", ";
-//     }
-//     std::cout << " ]" << std::endl;
-// }
-
-// template<typename T>
-// void printContainer(const Container<T>* cont) {
-//     std::cout << "[ ";
-//     for (int i = 0; i < cont->getSize(); ++i) {
-//         std::cout << cont->get(i);
-//         if (i < cont->getSize() - 1) std::cout << ", ";
-//     }
-//     std::cout << " ]" << std::endl;
-// }
+// Helper functions for functional operations
+int square(int x) { return x * x; }
+bool isEven(int x) { return x % 2 == 0; }
+int sum(int a, int b) { return a + b; }
+Sequence<int>* doubleValue(int x) {
+    int* arr = new int[2]{x * 2, x * 2 + 1};
+    Sequence<int>* seq = new MutableArraySequence<int>(arr, 2);
+    delete[] arr;
+    return seq;
+}
 
 void arraySequenceMenu(MutableArraySequence<int>& seq) {
     while (true) {
         std::cout << "\nArraySequence Menu:\n";
         std::cout << "1. Append\n2. Prepend\n3. InsertAt\n4. Remove\n5. RemoveAt\n";
-        std::cout << "6. Get\n7. GetFirst\n8. GetLast\n9. GetLength\n10. Sum\n";
-        std::cout << "11. Product\n12. Clear\n13. Contains\n14. Print\n15. Back\n";
+        std::cout << "6. Get\n7. GetFirst\n8. GetLast\n9. GetLength\n10. Map\n";
+        std::cout << "11. Reduce\n12. Where\n13. Zip\n14. FlatMap\n";
+        std::cout << "15. Split\n16. Clear\n17. Contains\n18. Print\n19. Back\n";
         std::cout << "Enter choice: ";
         int choice;
         std::cin >> choice;
@@ -101,27 +95,69 @@ void arraySequenceMenu(MutableArraySequence<int>& seq) {
                 case 9:
                     std::cout << "Length: " << seq.GetLength() << std::endl;
                     break;
-                case 10:
-                   // std::cout << "Sum: " << seq.Sum() << std::endl;
+                case 10: {
+                    auto* mapped = seq.Map(square);
+                    std::cout << "Mapped (square): " << mapped->toString() << std::endl;
+                    delete mapped;
                     break;
-                case 11:
-                    //std::cout << "Product: " << seq.Product() << std::endl;
+                }
+                case 11: {
+                    auto* reduced = seq.Reduce(sum, 0);
+                    std::cout << "Reduced (sum): " << reduced->Get(0) << std::endl;
+                    delete reduced;
                     break;
-                case 12:
+                }
+                case 12: {
+                    auto* filtered = seq.Where(isEven);
+                    std::cout << "Filtered (even): " << filtered->toString() << std::endl;
+                    delete filtered;
+                    break;
+                }
+                case 13: {
+                    int items[] = {10, 20, 30, 40, 50};
+                    MutableArraySequence<int> other(items, 5);
+                    auto* zipped = seq.Zip(other);
+                    std::cout << "Zipped: [ ";
+                    for (int i = 0; i < zipped->GetLength(); ++i) {
+                        auto tuple = zipped->Get(i);
+                        std::cout << "(" << std::get<0>(tuple) << ", " << std::get<1>(tuple) << ")";
+                        if (i < zipped->GetLength() - 1) std::cout << ", ";
+                    }
+                    std::cout << " ]" << std::endl;
+                    delete zipped;
+                    break;
+                }
+                case 14: {
+                    auto* flatMapped = seq.FlatMap(doubleValue);
+                    std::cout << "FlatMapped (double): " << flatMapped->toString() << std::endl;
+                    delete flatMapped;
+                    break;
+                }
+                case 15: {
+                    auto* split = seq.Split(isEven);
+                    std::cout << "Split (by even): ";
+                    for (int i = 0; i < split->GetLength(); ++i) {
+                        std::cout << split->Get(i)->toString() << " ";
+                    }
+                    std::cout << std::endl;
+                    delete split;
+                    break;
+                }
+                case 16:
                     seq.Clear();
                     std::cout << "Sequence cleared" << std::endl;
                     break;
-                case 13: {
+                case 17: {
                     std::cout << "Enter value: ";
                     int value;
                     std::cin >> value;
                     std::cout << (seq.Contains(value) ? "Contains: true" : "Contains: false") << std::endl;
                     break;
                 }
-                case 14:
+                case 18:
                     std::cout << "Sequence: " << seq.toString() << std::endl;
                     break;
-                case 15:
+                case 19:
                     return;
                 default:
                     std::cout << "Invalid choice" << std::endl;
@@ -140,8 +176,9 @@ void listSequenceMenu(MutableListSequence<int>& seq) {
     while (true) {
         std::cout << "\nListSequence Menu:\n";
         std::cout << "1. Append\n2. Prepend\n3. InsertAt\n4. Remove\n5. RemoveAt\n";
-        std::cout << "6. Get\n7. GetFirst\n8. GetLast\n9. GetLength\n10. Sum\n";
-        std::cout << "11. Product\n12. Clear\n13. Contains\n14. Print\n15. Back\n";
+        std::cout << "6. Get\n7. GetFirst\n8. GetLast\n9. GetLength\n10. Map\n";
+        std::cout << "11. Reduce\n12. Where\n13. Zip\n14. FlatMap\n";
+        std::cout << "15. Split\n16. Clear\n17. Contains\n18. Print\n19. Back\n";
         std::cout << "Enter choice: ";
         int choice;
         std::cin >> choice;
@@ -210,27 +247,69 @@ void listSequenceMenu(MutableListSequence<int>& seq) {
                 case 9:
                     std::cout << "Length: " << seq.GetLength() << std::endl;
                     break;
-                case 10:
-                    //std::cout << "Sum: " << seq.Sum() << std::endl;
+                case 10: {
+                    auto* mapped = seq.Map(square);
+                    std::cout << "Mapped (square): " << mapped->toString() << std::endl;
+                    delete mapped;
                     break;
-                case 11:
-                    //std::cout << "Product: " << seq.Product() << std::endl;
+                }
+                case 11: {
+                    auto* reduced = seq.Reduce(sum, 0);
+                    std::cout << "Reduced (sum): " << reduced->Get(0) << std::endl;
+                    delete reduced;
                     break;
-                case 12:
+                }
+                case 12: {
+                    auto* filtered = seq.Where(isEven);
+                    std::cout << "Filtered (even): " << filtered->toString() << std::endl;
+                    delete filtered;
+                    break;
+                }
+                case 13: {
+                    int items[] = {10, 20, 30, 40, 50};
+                    MutableListSequence<int> other(items, 5);
+                    auto* zipped = seq.Zip(other);
+                    std::cout << "Zipped: [ ";
+                    for (int i = 0; i < zipped->GetLength(); ++i) {
+                        auto tuple = zipped->Get(i);
+                        std::cout << "(" << std::get<0>(tuple) << ", " << std::get<1>(tuple) << ")";
+                        if (i < zipped->GetLength() - 1) std::cout << ", ";
+                    }
+                    std::cout << " ]" << std::endl;
+                    delete zipped;
+                    break;
+                }
+                case 14: {
+                    auto* flatMapped = seq.FlatMap(doubleValue);
+                    std::cout << "FlatMapped (double): " << flatMapped->toString() << std::endl;
+                    delete flatMapped;
+                    break;
+                }
+                case 15: {
+                    auto* split = seq.Split(isEven);
+                    std::cout << "Split (by even): ";
+                    for (int i = 0; i < split->GetLength(); ++i) {
+                        std::cout << split->Get(i)->toString() << " ";
+                    }
+                    std::cout << std::endl;
+                    delete split;
+                    break;
+                }
+                case 16:
                     seq.Clear();
                     std::cout << "Sequence cleared" << std::endl;
                     break;
-                case 13: {
+                case 17: {
                     std::cout << "Enter value: ";
                     int value;
                     std::cin >> value;
                     std::cout << (seq.Contains(value) ? "Contains: true" : "Contains: false") << std::endl;
                     break;
                 }
-                case 14:
+                case 18:
                     std::cout << "Sequence: " << seq.toString() << std::endl;
                     break;
-                case 15:
+                case 19:
                     return;
                 default:
                     std::cout << "Invalid choice" << std::endl;
@@ -249,8 +328,8 @@ void segmentedListMenu(SegmentedList<int>& seq) {
     while (true) {
         std::cout << "\nSegmentedList Menu:\n";
         std::cout << "1. Append\n2. Prepend\n3. InsertAt\n4. Remove\n5. RemoveAt\n";
-        std::cout << "6. Get\n7. GetFirst\n8. GetLast\n9. GetLength\n10. Sum\n";
-        std::cout << "11. Product\n12. Clear\n13. Contains\n14. Print\n15. Back\n";
+        std::cout << "6. Get\n7. GetFirst\n8. GetLast\n9. GetLength\n";
+        std::cout << "10. Clear\n11. Contains\n12. Print\n13. Back\n";
         std::cout << "Enter choice: ";
         int choice;
         std::cin >> choice;
@@ -320,26 +399,20 @@ void segmentedListMenu(SegmentedList<int>& seq) {
                     std::cout << "Length: " << seq.GetLength() << std::endl;
                     break;
                 case 10:
-                    //std::cout << "Sum: " << seq.Sum() << std::endl;
-                    break;
-                case 11:
-                    //std::cout << "Product: " << seq.Product() << std::endl;
-                    break;
-                case 12:
                     seq.Clear();
                     std::cout << "Sequence cleared" << std::endl;
                     break;
-                case 13: {
+                case 11: {
                     std::cout << "Enter value: ";
                     int value;
                     std::cin >> value;
                     std::cout << (seq.Contains(value) ? "Contains: true" : "Contains: false") << std::endl;
                     break;
                 }
-                case 14:
+                case 12:
                     std::cout << "Sequence: " << seq.toString() << std::endl;
                     break;
-                case 15:
+                case 13:
                     return;
                 default:
                     std::cout << "Invalid choice" << std::endl;
@@ -358,8 +431,9 @@ void adaptiveSequenceMenu(AdaptiveSequence<int>& seq) {
     while (true) {
         std::cout << "\nAdaptiveSequence Menu:\n";
         std::cout << "1. Append\n2. Prepend\n3. InsertAt\n4. Remove\n5. RemoveAt\n";
-        std::cout << "6. Get\n7. GetFirst\n8. GetLast\n9. GetLength\n10. Sum\n";
-        std::cout << "11. Product\n12. Clear\n13. Contains\n14. Print\n15. Back\n";
+        std::cout << "6. Get\n7. GetFirst\n8. GetLast\n9. GetLength\n10. Map\n";
+        std::cout << "11. Reduce\n12. Where\n13. Zip\n14. FlatMap\n";
+        std::cout << "15. Clear\n16. Contains\n17. Print\n18. Back\n";
         std::cout << "Enter choice: ";
         int choice;
         std::cin >> choice;
@@ -428,27 +502,59 @@ void adaptiveSequenceMenu(AdaptiveSequence<int>& seq) {
                 case 9:
                     std::cout << "Length: " << seq.GetLength() << std::endl;
                     break;
-                case 10:
-                    //std::cout << "Sum: " << seq.Sum() << std::endl;
+                case 10: {
+                    auto* mapped = seq.Map(square);
+                    std::cout << "Mapped (square): " << mapped->toString() << std::endl;
+                    delete mapped;
                     break;
-                case 11:
-                    //std::cout << "Product: " << seq.Product() << std::endl;
+                }
+                case 11: {
+                    auto* reduced = seq.Reduce(sum, 0);
+                    std::cout << "Reduced (sum): " << reduced->Get(0) << std::endl;
+                    delete reduced;
                     break;
-                case 12:
+                }
+                case 12: {
+                    auto* filtered = seq.Where(isEven);
+                    std::cout << "Filtered (even): " << filtered->toString() << std::endl;
+                    delete filtered;
+                    break;
+                }
+                case 13: {
+                    int items[] = {10, 20, 30, 40, 50};
+                    AdaptiveSequence<int> other(items, 5);
+                    auto* zipped = seq.Zip(other);
+                    std::cout << "Zipped: [ ";
+                    for (int i = 0; i < zipped->GetLength(); ++i) {
+                        auto tuple = zipped->Get(i);
+                        std::cout << "(" << std::get<0>(tuple) << ", " << std::get<1>(tuple) << ")";
+                        if (i < zipped->GetLength() - 1) std::cout << ", ";
+                    }
+                    std::cout << " ]" << std::endl;
+                    delete zipped;
+                    break;
+                }
+                case 14: {
+                    auto* flatMapped = seq.FlatMap(doubleValue);
+                    std::cout << "FlatMapped (double): " << flatMapped->toString() << std::endl;
+                    delete flatMapped;
+                    break;
+                }
+                case 15:
                     seq.Clear();
                     std::cout << "Sequence cleared" << std::endl;
                     break;
-                case 13: {
+                case 16: {
                     std::cout << "Enter value: ";
                     int value;
                     std::cin >> value;
                     std::cout << (seq.Contains(value) ? "Contains: true" : "Contains: false") << std::endl;
                     break;
                 }
-                case 14:
+                case 17:
                     std::cout << "Sequence: " << seq.toString() << std::endl;
                     break;
-                case 15:
+                case 18:
                     return;
                 default:
                     std::cout << "Invalid choice" << std::endl;
@@ -631,8 +737,6 @@ int main() {
     AdaptiveSequence<int> adaptSeq;
     LinkedList<int> linkedList;
     DynamicArray<int> dynArray;
-
-    //std::unique_ptr<IEnumerator<int>> iter = arraySeq.GetEnumerator();
 
     while (true) {
         std::cout << "\nMain Menu:\n";

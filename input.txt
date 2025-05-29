@@ -20,8 +20,8 @@ Adaptive Append 10
 Adaptive Contains 10
 Adaptive Contains 999
 Adaptive Remove 10
-Adaptive Zip 1,2,3
 Adaptive From 1,2,3,4
+Adaptive Zip 1,2,3
 Adaptive CopyConstructor
 Adaptive CopyAssignment
 
@@ -66,8 +66,8 @@ Array Clear
 Array Append 6
 Array Contains 6
 Array Remove 6
-Array Zip 7,8
 Array From 1,2,3
+Array Zip 1,2,3
 Array IndexOperator 1 99
 Array CopyConstructor
 Array CopyAssignment
@@ -93,8 +93,8 @@ List Clear
 List Append 15
 List Contains 15
 List Remove 15
-List Zip 16,17
 List From 1,2,3
+List Zip 1,2,3
 List IndexOperator 0 88
 List CopyConstructor
 List CopyAssignment
@@ -105,4 +105,3 @@ Adaptive RemoveAt 999
 Adaptive GetSubSequence 0 999
 Adaptive Contains 999
 Array IndexOperator 999 5
-List Zip 1
