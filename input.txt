@@ -1,0 +1,108 @@
+# Test basic operations
+Adaptive Append 5
+Adaptive Append 6
+Adaptive Prepend 4
+Adaptive InsertAt 1 7
+Adaptive RemoveAt 2
+Adaptive GetSubSequence 0 2
+Adaptive Concat 8,9
+Adaptive Map
+Adaptive Where
+Adaptive GetFirst
+Adaptive GetLast
+Adaptive Get 1
+Adaptive GetLength
+Adaptive GetEnumerator
+Adaptive FlatMap
+Adaptive Reduce
+Adaptive Clear
+Adaptive Append 10
+Adaptive Contains 10
+Adaptive Contains 999
+Adaptive Remove 10
+Adaptive Zip 1,2,3
+Adaptive From 1,2,3,4
+Adaptive CopyConstructor
+Adaptive CopyAssignment
+
+# Test SegmentedList (no Map, Where, etc.)
+Segmented Append 5
+Segmented Prepend 4
+Segmented InsertAt 1 6
+Segmented RemoveAt 1
+Segmented GetSubSequence 0 1
+Segmented Concat 7,8
+Segmented GetFirst
+Segmented GetLast
+Segmented Get 0
+Segmented GetLength
+Segmented GetEnumerator
+Segmented Clear
+Segmented Append 9
+Segmented Contains 9
+Segmented Remove 9
+Segmented From 1,2,3
+Segmented CopyConstructor
+Segmented CopyAssignment
+
+# Test ArraySequence with additional methods
+Array Append 1
+Array Prepend 2
+Array InsertAt 1 3
+Array RemoveAt 0
+Array GetSubSequence 0 1
+Array Concat 4,5
+Array Map
+Array Where
+Array GetFirst
+Array GetLast
+Array Get 1
+Array GetLength
+Array GetEnumerator
+Array FlatMap
+Array Split
+Array Reduce
+Array Clear
+Array Append 6
+Array Contains 6
+Array Remove 6
+Array Zip 7,8
+Array From 1,2,3
+Array IndexOperator 1 99
+Array CopyConstructor
+Array CopyAssignment
+
+# Test ListSequence with additional methods
+List Append 10
+List Prepend 11
+List InsertAt 1 12
+List RemoveAt 2
+List GetSubSequence 0 1
+List Concat 13,14
+List Map
+List Where
+List GetFirst
+List GetLast
+List Get 0
+List GetLength
+List GetEnumerator
+List FlatMap
+List Split
+List Reduce
+List Clear
+List Append 15
+List Contains 15
+List Remove 15
+List Zip 16,17
+List From 1,2,3
+List IndexOperator 0 88
+List CopyConstructor
+List CopyAssignment
+
+# Edge cases and errors
+Adaptive Get -1
+Adaptive RemoveAt 999
+Adaptive GetSubSequence 0 999
+Adaptive Contains 999
+Array IndexOperator 999 5
+List Zip 1
